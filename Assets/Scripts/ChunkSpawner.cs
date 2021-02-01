@@ -1,60 +1,81 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class ChunkSpawner : MonoBehaviour
+namespace Jaba.Route
 {
-
-    [SerializeField]
-    private GameObject chunkPrefab;
-
-    [SerializeField]
-    private int initialChunksCount;
-
-    private List<GameObject> spawnedChunks = new List<GameObject>();
-
-    private void Awake()
+    public class ChunkSpawner : MonoBehaviour
     {
-        GetSpawnedChunks();
-        SpawnNewChunk(initialChunksCount);
-    }
+        #region Variables
 
-    private void GetSpawnedChunks()
-    {
-        for (int i = 0; i < transform.childCount; i++)
+        private readonly List<GameObject> spawnedChunks = new List<GameObject>();
+
+        [SerializeField]
+        private GameObject chunkPrefab;
+
+        [SerializeField]
+        private int initialChunksCount;
+
+        #endregion
+
+        #region BuiltIn Methods
+
+        private void Awake()
         {
-            spawnedChunks.Add(transform.GetChild(i).gameObject);
+            GetSpawnedChunks();
+            SpawnNewChunk(initialChunksCount);
         }
-    }
 
-    private Vector3 GetNewChunkPos()
-    {
-        var lastChunkPos = spawnedChunks[spawnedChunks.Count - 1].transform.position;
+        #endregion
 
-        if (Random.Range(0, 2) == 0)
+        #region Custom Methods
+
+        #region Get Data Methods
+
+        private void GetSpawnedChunks()
         {
-            return new Vector3(lastChunkPos.x, lastChunkPos.y, lastChunkPos.z + chunkPrefab.transform.localScale.z);
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                spawnedChunks.Add(transform.GetChild(i).gameObject);
+            }
         }
-        else
+
+        private Vector3 GetNewChunkPos()
         {
-            return new Vector3(lastChunkPos.x + chunkPrefab.transform.localScale.x, lastChunkPos.y, lastChunkPos.z);
+            var lastChunkPos = spawnedChunks[spawnedChunks.Count - 1].transform.position;
+
+            if (Random.Range(0, 2) == 0)
+            {
+                return new Vector3(lastChunkPos.x, lastChunkPos.y, lastChunkPos.z + chunkPrefab.transform.localScale.z);
+            }
+            else
+            {
+                return new Vector3(lastChunkPos.x + chunkPrefab.transform.localScale.x, lastChunkPos.y, lastChunkPos.z);
+            }
         }
-    }
 
-    public void SpawnNewChunk()
-    {
-        var newChunk = Instantiate(chunkPrefab, GetNewChunkPos(), Quaternion.identity, transform);
-        Destroy(spawnedChunks[0]);
-        spawnedChunks.Remove(spawnedChunks[0]);
-        spawnedChunks.Add(newChunk);
-    }
+        #endregion
 
-    public void SpawnNewChunk(int newChunksCount)
-    {
-        for (int i = 0; i < newChunksCount; i++)
+        #region Spawn Methods
+
+        public void SpawnNewChunk()
         {
             var newChunk = Instantiate(chunkPrefab, GetNewChunkPos(), Quaternion.identity, transform);
+            Destroy(spawnedChunks[0]);
+            spawnedChunks.Remove(spawnedChunks[0]);
             spawnedChunks.Add(newChunk);
         }
+
+        public void SpawnNewChunk(int newChunksCount)
+        {
+            for (int i = 0; i < newChunksCount; i++)
+            {
+                var newChunk = Instantiate(chunkPrefab, GetNewChunkPos(), Quaternion.identity, transform);
+                spawnedChunks.Add(newChunk);
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }

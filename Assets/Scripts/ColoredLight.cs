@@ -1,49 +1,61 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Jaba.Route.UI;
+using System.Collections;
 using UnityEngine;
 
-public class ColoredLight : MonoBehaviour
+namespace Jaba.Route
 {
-    private int changeColorScoreStep;
-
-    private int multiplier = 1;
-
-    [SerializeField]
-    private Color[] colors;
-
-    private Light thisLight;
-
-    [SerializeField]
-    private Score score;
-
-    private void Start()
+    public class ColoredLight : MonoBehaviour
     {
-        thisLight = GetComponent<Light>();
-        changeColorScoreStep = Random.Range(40, 60);  
-    }
+        #region Variables
 
-    private void Update()
-    {
-        if ((changeColorScoreStep * multiplier) > score.score)
-            return;
-        else
+        [SerializeField]
+        private Score score;
+
+        [SerializeField]
+        private Color[] colors;
+
+        private Light thisLight;
+
+        private int changeColorScoreStep;
+        private int multiplier = 1;
+
+        #endregion
+
+        #region BuiltIn Methods
+
+        private void Start()
         {
-            StartCoroutine(SmoothColor(colors[Random.Range(0, colors.Length)], 2f));
-            multiplier++;
+            thisLight = GetComponent<Light>();
+            changeColorScoreStep = Random.Range(40, 60);
         }
-        
-    }
 
-    private IEnumerator SmoothColor(Color endColor, float time)
-    {
-
-        float currentTime = 0f;
-        do
+        private void Update()
         {
-            thisLight.color = Color.Lerp(thisLight.color, endColor, currentTime / time);
-            currentTime += Time.deltaTime;
-            yield return null;
+            if (changeColorScoreStep * multiplier > score.score)
+                return;
+            else
+            {
+                StartCoroutine(SmoothColor(colors[Random.Range(0, colors.Length)], 2f));
+                multiplier++;
+            }
         }
-        while (currentTime <= time);
+
+        #endregion
+
+        #region Custom Methods
+
+        private IEnumerator SmoothColor(Color endColor, float time)
+        {
+            float currentTime = 0f;
+            do
+            {
+                thisLight.color = Color.Lerp(thisLight.color, endColor, currentTime / time);
+                currentTime += Time.deltaTime;
+                yield return null;
+            }
+            while (currentTime <= time);
+        }
+
+        #endregion
     }
 }

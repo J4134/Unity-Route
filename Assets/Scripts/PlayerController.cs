@@ -1,78 +1,101 @@
-﻿using System;
-
+﻿using Jaba.Route.Triggers;
+using System;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+namespace Jaba.Route
 {
-    public static Action OnGameStopped;
-    public static Action OnGameStarted;
-
-    [SerializeField]
-    private float _speed = 5f;
-
-    [SerializeField]
-    private float _accelerationStep = 0.1f;
-
-    private Vector3 _direction = new Vector3(0f, 0f, 1f);
-
-    public bool canControl = false;
-    public bool moving = false;
-
-    private void OnEnable()
+    public class PlayerController : MonoBehaviour
     {
-        SpawnTrigger.OnSpawnTriggerEntered += IncreaseSpeed;
-    }
+        #region Variables
 
-    private void OnDisable()
-    {
-        SpawnTrigger.OnSpawnTriggerEntered -= IncreaseSpeed;
-    }
+        public static Action OnGameStopped;
+        public static Action OnGameStarted;
 
-    private void FixedUpdate()
-    {
-        Move();
-    }
+        private Vector3 direction = new Vector3(0f, 0f, 1f);
 
-    private void Move()
-    {
-        if (moving)
-            transform.Translate(_direction * _speed * Time.fixedDeltaTime);
-    }
+        [SerializeField]
+        private float speed = 5f;
 
-    private void IncreaseSpeed()
-    {
-        _speed += _accelerationStep;
-    }
+        [SerializeField]
+        private float accelerationStep = 0.1f;
 
-    public void ChangeDirection()
-    {
-        if (canControl)
-            _direction = _direction == new Vector3(1f, 0f, 0f) ? new Vector3(0f, 0f, 1f) : new Vector3(1f, 0f, 0f);
-    }
+        public bool canControl = false;
+        public bool moving = false;
 
-    public void StartGame()
-    {
-        moving = true;
-        canControl = true;
+        #endregion
 
-        OnGameStarted?.Invoke();
-    }
+        #region BuiltIn Methods
 
-    public void StopGame()
-    {
-        canControl = false;
-
-        OnGameStopped?.Invoke();
-
-        Destroy(gameObject, 5f);
-    }
-
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (!canControl)
+        private void OnEnable()
         {
-            moving = false;
+            SpawnTrigger.OnSpawnTriggerEntered += IncreaseSpeed;
         }
+
+        private void OnDisable()
+        {
+            SpawnTrigger.OnSpawnTriggerEntered -= IncreaseSpeed;
+        }
+
+        private void FixedUpdate()
+        {
+            Move();
+        }
+
+        #endregion
+
+        #region Custom Methods
+
+        #region Ball Control
+
+        private void Move()
+        {
+            if (moving)
+                transform.Translate(direction * speed * Time.fixedDeltaTime);
+        }
+
+        private void IncreaseSpeed()
+        {
+            speed += accelerationStep;
+        }
+
+        public void ChangeDirection()
+        {
+            if (canControl)
+                direction = direction == new Vector3(1f, 0f, 0f) ? new Vector3(0f, 0f, 1f) : new Vector3(1f, 0f, 0f);
+        }
+
+        #endregion
+
+        #region Game Control
+
+        public void StartGame()
+        {
+            moving = true;
+            canControl = true;
+
+            OnGameStarted?.Invoke();
+        }
+
+        public void StopGame()
+        {
+            canControl = false;
+            Destroy(gameObject, 5f);
+
+            OnGameStopped?.Invoke();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Collisions
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!canControl)
+                moving = false;
+        }
+
+        #endregion
     }
 }
